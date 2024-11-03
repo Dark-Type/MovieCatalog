@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A5BFDB8B2CD1445200C74AA7 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = A5BFDB8A2CD1445200C74AA7 /* Alamofire */; };
+		A5BFDD572CD5071500C74AA7 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = A5BFDD562CD5071500C74AA7 /* SDWebImage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A54127AC2CB8417100A45751 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5BFDD572CD5071500C74AA7 /* SDWebImage in Frameworks */,
+				A5BFDB8B2CD1445200C74AA7 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +132,8 @@
 			);
 			name = MovieCatalog;
 			packageProductDependencies = (
+				A5BFDB8A2CD1445200C74AA7 /* Alamofire */,
+				A5BFDD562CD5071500C74AA7 /* SDWebImage */,
 			);
 			productName = MovieCatalog;
 			productReference = A54127952CB8417000A45751 /* MovieCatalog.app */;
@@ -208,6 +217,10 @@
 			);
 			mainGroup = A541278C2CB8417000A45751;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A5BFDB892CD1445200C74AA7 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				A5BFDD552CD5071500C74AA7 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A54127962CB8417000A45751 /* Products */;
 			projectDirPath = "";
@@ -294,9 +307,9 @@
 				INFOPLIST_FILE = MovieCatalog/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -322,9 +335,9 @@
 				INFOPLIST_FILE = MovieCatalog/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -569,6 +582,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A5BFDB892CD1445200C74AA7 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.1;
+			};
+		};
+		A5BFDD552CD5071500C74AA7 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.20.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A5BFDB8A2CD1445200C74AA7 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5BFDB892CD1445200C74AA7 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		A5BFDD562CD5071500C74AA7 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5BFDD552CD5071500C74AA7 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A541278D2CB8417000A45751 /* Project object */;
 }
