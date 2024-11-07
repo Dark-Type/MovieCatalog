@@ -50,12 +50,3 @@ struct RatingView: View {
     }
 }
 
-#Preview {
-    RatingView(ratings: [
-        Rating(id: "1", rating: 10.0, image: UIImage(named: "Poster1")!),
-        Rating(id: "2", rating: 8.0, image: UIImage(named: "Poster2")!),
-        Rating(id: "3", rating: 9.0, image: UIImage(named: "Poster3")!),
-        Rating(id: "4", rating: 8.0, image: UIImage(named: "Poster2")!),
-        Rating(id: "5", rating: 9.0, image: UIImage(named: "Poster3")!)
-    ])
-}

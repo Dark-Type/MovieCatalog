@@ -19,8 +19,8 @@ struct MovieDetailsData: Decodable {
     let tagline: String
     let description: String
     let director: String
-    let budget: Int
-    let fees: Int
+    let budget: Int?
+    let fees: Int?
     let ageLimit: Int
 }
 

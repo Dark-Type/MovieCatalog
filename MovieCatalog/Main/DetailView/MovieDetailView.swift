@@ -23,6 +23,8 @@ struct MovieDetailView: View {
     @StateObject private var viewModel: MovieDetailViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var showAddReview = false
+    @State private var isEditingReview = false
+    @State private var reviewToEdit: Review?
 
     init(movie: Movie) {
         _viewModel = StateObject(wrappedValue: MovieDetailViewModel(movie: movie))
@@ -49,25 +51,26 @@ struct MovieDetailView: View {
                             .cornerRadius(MovieDetailViewConstants.buttonCornerRadius)
                     }
                     Spacer()
+                    favoriteButton
                 }
                 .padding()
                 .background(Color.clear)
 
                 ScrollView {
                     VStack(spacing: MovieDetailViewConstants.padding) {
-                        Spacer().frame(height: 200)
+                        Spacer().frame(height: 350)
 
                         LabelView(mainText: viewModel.movie.name, descriptionText: viewModel.movie.tagline)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 5)
 
-                        FriendsListView(friendsCount: 1, images: [Image(uiImage: viewModel.movie.poster)])
-                            .padding(.horizontal)
+                        FriendsListView(viewModel: viewModel)
+                            .padding(.horizontal, 5)
 
                         DescriptionView(description: viewModel.movie.description)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 5)
 
                         RatingView(ratings: viewModel.movie.ratings)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 5)
 
                         InfoView(
                             title: viewModel.movie.name,
@@ -76,36 +79,46 @@ struct MovieDetailView: View {
                             timeDuration: viewModel.movie.time,
                             ageRestriction: viewModel.movie.ageLimit
                         )
-                        .padding(.horizontal)
+                        .padding(.horizontal, 5)
 
                         DirectorView(authors: viewModel.movie.directors)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 5)
 
-                        GenresView(genres: viewModel.movie.genres)
-                            .padding(.horizontal)
+                        GenresView(viewModel: viewModel, genres: viewModel.movie.genres)
+                            .padding(.horizontal, 5)
 
                         RevenueView(revenues: [
-                            Revenue(title: "Box Office", description: "$\(viewModel.movie.fees)"),
-                            Revenue(title: "Budget", description: "$\(viewModel.movie.budget)")
-                        ])
-                        .padding(.horizontal)
+                            Revenue(title: "Бюджет", description: "$\(viewModel.movie.budget)"),
+                            Revenue(title: "Сборы в мире", description: "$\(viewModel.movie.fees)")
 
-                        ReviewsView(reviews: viewModel.movie.reviews, showAddReview: $showAddReview)
-                            .padding(.horizontal)
+                        ])
+                        .padding(.horizontal, 5)
+
+                        ReviewsView(reviews: viewModel.reviews, showAddReview: $showAddReview, viewModel: viewModel, onEdit: { review in
+                            reviewToEdit = review
+                            isEditingReview = true
+                        })
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, 5)
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
 
-            if showAddReview {
-                Color.black.opacity(MovieDetailViewConstants.overlayOpacity)
-                    .edgesIgnoringSafeArea(.all)
-                    .onTapGesture {
-                        showAddReview = false
-                    }
+            if showAddReview || isEditingReview {
+                GeometryReader { geometry in
+                    Color.black.opacity(0.5)
+                        .edgesIgnoringSafeArea(.all)
+                        .onTapGesture {
+                            showAddReview = false
+                            isEditingReview = false
+                        }
 
-                AddReviewView(showPopup: $showAddReview)
+                    AddReviewView(
+                        review: reviewToEdit,
+                        viewModel: viewModel,
+                        showPopup: showAddReview ? $showAddReview : $isEditingReview
+                    )
                     .frame(
                         width: UIScreen.main.bounds.width * MovieDetailViewConstants.popupWidthMultiplier,
                         height: UIScreen.main.bounds.height * MovieDetailViewConstants.popupHeightMultiplier
@@ -115,6 +128,8 @@ struct MovieDetailView: View {
                     .shadow(radius: MovieDetailViewConstants.popupShadowRadius)
                     .transition(.move(edge: .bottom))
                     .zIndex(1)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                }
             }
 
             if viewModel.isLoading {
@@ -137,11 +152,20 @@ struct MovieDetailView: View {
         }
         .background(Color(ColorsEnum.baseDarkGrey))
         .onAppear {
-            UINavigationBar.appearance().isHidden = true
-        }
-        .onDisappear {
-            UINavigationBar.appearance().isHidden = false
+            viewModel.loadFriendsWithHighReviews()
         }
     }
-}
 
+    private var favoriteButton: some View {
+        Button(action: {
+            viewModel.toggleFavoriteStatus()
+        }) {
+            Image(viewModel.isFavorite ? "FilledHeart" : "EmptyHeart")
+                .renderingMode(.template)
+                .tint(.white)
+                .padding()
+                .background(viewModel.isFavorite ? AnyView(ColorsEnum.orangeLinearGradient) : AnyView(Color(ColorsEnum.baseGrey)))
+                .frame(width: MovieDetailViewConstants.buttonSize, height: MovieDetailViewConstants.buttonSize)
+                .cornerRadius(MovieDetailViewConstants.buttonCornerRadius)
+        }
+    }}

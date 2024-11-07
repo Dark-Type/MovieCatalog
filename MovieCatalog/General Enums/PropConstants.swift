@@ -25,7 +25,6 @@ enum PropConstants {
     static let description = "Some description Some description Some description Some description Some description Some description"
     static let denisZmeev = "Denis Zmeev"
     static let poster1 = "Poster1"
-    static let poster2 = "Poster2"
     static let poster3 = "Poster3"
     static let favorites = "Избранное"
     static let favoriteGenres = "Любимые жанры"

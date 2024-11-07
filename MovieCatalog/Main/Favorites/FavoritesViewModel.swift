@@ -22,7 +22,7 @@ class FavoriteFilmsViewModel: ObservableObject {
     }
 
     func loadFavoriteGenres() {
-        favoriteGenres = GenreManager.shared.favoriteGenres
+        favoriteGenres = ServiceManager.shared.genresService.loadFavoriteGenres()
     }
 
     func loadFavoriteFilms() {
@@ -46,5 +46,10 @@ class FavoriteFilmsViewModel: ObservableObject {
 
     func selectMovie(_ movie: MoviesGeneral) {
         delegate?.favoriteFilmsViewModelDidSelectMovie(movie)
+    }
+
+    func toggleFavoriteGenre(_ genre: Genre) {
+        ServiceManager.shared.genresService.toggleFavoriteStatus(for: genre)
+        loadFavoriteGenres()
     }
 }

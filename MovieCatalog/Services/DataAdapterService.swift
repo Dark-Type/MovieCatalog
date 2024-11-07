@@ -64,8 +64,6 @@ class DataAdapterService {
         }
     }
 
-   
-
     func adaptMovieSummaryData(_ movieData: MovieSummary, favoriteMovies: [MovieSummary], completion: @escaping (Result<MoviesGeneral, Error>) -> Void) {
         guard let imageURL = URL(string: movieData.poster), imageURL.scheme != nil else {
             completion(.failure(NSError(domain: "", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
@@ -81,7 +79,7 @@ class DataAdapterService {
                     Genre(
                         id: genreSummary.id,
                         name: genreSummary.name,
-                        isFavorite: GenreManager.shared.isFavorite(genre: Genre(id: genreSummary.id, name: genreSummary.name, isFavorite: false))
+                        isFavorite: ServiceManager.shared.genresService.isFavorite(genre: Genre(id: genreSummary.id, name: genreSummary.name, isFavorite: false))
                     )
                 }
                 let movieGeneral = MoviesGeneral(
@@ -151,6 +149,7 @@ class DataAdapterService {
             }
         }
     }
+
     func adaptMoviesSummaryToFeedMovies(_ moviesData: [MovieSummary], completion: @escaping (Result<[FeedMovie], Error>) -> Void) {
         var feedMovies: [FeedMovie] = []
         let group = DispatchGroup()

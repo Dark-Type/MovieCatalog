@@ -15,7 +15,6 @@ enum RegisterVCStrings: String {
     case nameHint = "Имя"
     case passwordHint = "Пароль"
     case confirmPasswordHint = "Подтвердить пароль"
-    case completeRegisterButtonTitle = "Complete Registration"
     case goBackImageName = "ChevronLeft"
     case lableText = "Регистрация"
 }
@@ -43,7 +42,6 @@ class RegisterVC: UIViewController {
     }
 
     private let goBackButton = MCGoBackButton(image: UIImage(named: RegisterVCStrings.goBackImageName.rawValue), labelText: RegisterVCStrings.lableText.rawValue)
-    private let completeRegisterButton = UIButton(type: .system)
     private let registerButton = MCButton(title: RegisterVCStrings.registerButtonTitle.rawValue)
     private let imageView = UIImageView(image: UIImage(named: RegisterVCStrings.backgroundImageName.rawValue))
     private let usernameTextField = MCTextField(hintText: RegisterVCStrings.usernameHint.rawValue)
@@ -56,62 +54,62 @@ class RegisterVC: UIViewController {
     private let stackView = UIStackView()
 
     override func viewDidLoad() {
-           super.viewDidLoad()
-           setupView()
-           setupButtons()
-           setupTextFields()
-           setupStackView()
-           setupConstraints()
-           setupKeyboardObservers()
-           setupTapGestureToDismissKeyboard()
-           bindViewModel()
-       }
+        super.viewDidLoad()
+        setupView()
+        setupButtons()
+        setupTextFields()
+        setupStackView()
+        setupConstraints()
+        setupKeyboardObservers()
+        setupTapGestureToDismissKeyboard()
+        bindViewModel()
+    }
 
-       private func bindViewModel() {
-           viewModel.uiDelegate = self
-           switchButton.delegate = self
-           datePicker.delegate = self
+    private func bindViewModel() {
+        viewModel.uiDelegate = self
+        switchButton.delegate = self
+        datePicker.delegate = self
 
-           usernameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-           emailTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-           nameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-           passwordTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-           confirmPasswordTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-       }
+        usernameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        emailTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        nameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        passwordTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        confirmPasswordTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+    }
+
     @objc private func textFieldDidChange() {
-         viewModel.username = usernameTextField.text
-         viewModel.email = emailTextField.text
-         viewModel.name = nameTextField.text
-         viewModel.password = passwordTextField.text
-         viewModel.confirmPassword = confirmPasswordTextField.text
-     }
+        viewModel.username = usernameTextField.text
+        viewModel.email = emailTextField.text
+        viewModel.name = nameTextField.text
+        viewModel.password = passwordTextField.text
+        viewModel.confirmPassword = confirmPasswordTextField.text
+        updateRegisterButtonState()
+    }
 
     private func updateRegisterButtonState() {
         if viewModel.areAllFieldsValid() {
             registerButton.isEnabled = true
             registerButton.addOrangeGradient()
         } else {
-            registerButton.isEnabled = true
+            registerButton.isEnabled = false
             registerButton.deleteOrangeGradient()
             registerButton.backgroundColor = ColorsEnum.baseGrey
         }
     }
-
 
     @objc private func goBackButtonTapped() {
         viewModel.handleDismiss()
     }
 
     @objc private func registerButtonTapped() {
-           storeUserData()
-           if viewModel.areAllFieldsValid() {
-               viewModel.handleCompleteRegistration()
-           } else {
-               showValidationError("Please ensure all fields are filled, the email is valid, and the passwords match.")
-           }
-       }
+        storeUserData()
+        if viewModel.areAllFieldsValid() {
+            viewModel.handleCompleteRegistration()
+        } else {
+            showValidationError("Please ensure all fields are filled, the email is valid, and the passwords match.")
+        }
+    }
 
-        
     private func storeUserData() {
         viewModel.username = usernameTextField.text
         viewModel.email = emailTextField.text
@@ -122,11 +120,9 @@ class RegisterVC: UIViewController {
         viewModel.isSwitchOn = switchButton.getIsLeftButtonOn()
     }
 
-
     @objc private func completeRegisterButtonTapped() {
         viewModel.handleCompleteRegistration()
     }
-    
 
     @objc private func keyboardWillShow(notification: NSNotification) {
         guard let userInfo = notification.userInfo,
@@ -144,7 +140,6 @@ class RegisterVC: UIViewController {
             }
         }
     }
-    
 
     @objc private func keyboardWillHide(notification: NSNotification) {
         UIView.animate(withDuration: 0.3) {
@@ -163,9 +158,10 @@ extension RegisterVC: MCToggleViewDelegate, MCDatePickerDelegate, RegisterVMUIDe
     }
 
     func didUpdateRegister() {
-        // Update UI
+
     }
 }
+
 extension RegisterVC {
     private func setupView() {
         view.backgroundColor = RegisterVCConstants.viewBackgroundColor
@@ -176,23 +172,19 @@ extension RegisterVC {
         view.addSubview(stackView)
         view.addSubview(registerButton)
         view.addSubview(goBackButton)
-        view.addSubview(completeRegisterButton)
     }
 
     private func setupButtons() {
         goBackButton.button.addTarget(self, action: #selector(goBackButtonTapped), for: .touchUpInside)
 
-        completeRegisterButton.setTitle(RegisterVCStrings.completeRegisterButtonTitle.rawValue, for: .normal)
-        completeRegisterButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        completeRegisterButton.heightAnchor.constraint(equalToConstant: RegisterVCConstants.heightOfItems).isActive = true
-        completeRegisterButton.translatesAutoresizingMaskIntoConstraints = false
-        completeRegisterButton.addTarget(self, action: #selector(completeRegisterButtonTapped), for: .touchUpInside)
+    
 
         registerButton.heightAnchor.constraint(equalToConstant: RegisterVCConstants.heightOfItems).isActive = true
         registerButton.translatesAutoresizingMaskIntoConstraints = false
         registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
-        registerButton.isEnabled = true
+        registerButton.isEnabled = false
     }
+
     private func setupTextFields() {
         usernameTextField.heightAnchor.constraint(equalToConstant: RegisterVCConstants.heightOfItems).isActive = true
         emailTextField.heightAnchor.constraint(equalToConstant: RegisterVCConstants.heightOfItems).isActive = true
@@ -242,8 +234,6 @@ extension RegisterVC {
             goBackButton.widthAnchor.constraint(equalToConstant: 250),
             goBackButton.heightAnchor.constraint(equalToConstant: 60),
 
-            completeRegisterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            completeRegisterButton.topAnchor.constraint(equalTo: goBackButton.bottomAnchor, constant: RegisterVCConstants.paddingSmall)
         ])
     }
 
@@ -251,8 +241,7 @@ extension RegisterVC {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
-}
-extension RegisterVC {
+
     private func showValidationError(_ message: String) {
         let alertController = UIAlertController(title: "Validation Error", message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -260,6 +249,7 @@ extension RegisterVC {
         present(alertController, animated: true, completion: nil)
     }
 }
+
 private extension UIView {
     func findFirstResponder() -> UIView? {
         if isFirstResponder {

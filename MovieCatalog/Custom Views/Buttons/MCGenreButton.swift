@@ -22,7 +22,6 @@ class MCGenreButton: MCButton {
     }
 
     @objc private func toggleFavorite() {
-        //не бейте пж
         print("Toggling favorite for genre: \(genre.name)")
         GenreManager.shared.toggleFavoriteStatus(for: genre)
         updateAppearance()
@@ -32,7 +31,7 @@ class MCGenreButton: MCButton {
         let isFavorite = GenreManager.shared.isFavorite(genre: genre)
         print("Updating appearance for genre: \(genre.name), isFavorite: \(isFavorite)")
         setTitleColor(isFavorite ? .white : MCButtonConstants.defaultFontColor, for: .normal)
-        if isFavorite {
+        if (isFavorite) {
             addOrangeGradient()
         } else {
             deleteOrangeGradient()

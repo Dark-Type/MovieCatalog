@@ -47,11 +47,12 @@ class RegisterVM {
             gender: isSwitchOn ? 0 : 1
         )
 
-        
         ServiceManager.shared.authService.register(user: registerRequest) { result in
             switch result {
             case .success(let token):
                 UserDefaults.standard.setValue(token, forKey: "authToken")
+                UserDefaults.standard.setValue(username, forKey: "userNickname")
+                ServiceManager.shared.setUserLogin(username)
                 self.navigationDelegate?.navigateToCompleteRegistration()
             case .failure(let error):
                 print("Registration failed: \(error)")

@@ -15,7 +15,8 @@ enum MCButtonConstants {
 }
 
 class MCButton: UIButton {
-    
+    private var gradientLayer: CAGradientLayer?
+
     init(title: String? = nil, fontSize: CGFloat = MCButtonConstants.defaultFontSize, isActive: Bool = false, fontColor: UIColor? = MCButtonConstants.defaultFontColor) {
         super.init(frame: .zero)
         setupGradientLayer()
@@ -51,17 +52,20 @@ class MCButton: UIButton {
     }
 
     func deleteOrangeGradient() {
-        layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
+        gradientLayer?.removeFromSuperlayer()
+        gradientLayer = nil
     }
 
     private func setupOrangeGradient() {
-        let gradientLayer = ColorsEnum.orangeGradient
+        let gradientLayer = ColorsEnum.orangeGradient()
         layer.insertSublayer(gradientLayer, at: 0)
+        self.gradientLayer = gradientLayer
         updateGradientFrame()
     }
 
     func setupSolidColorBackground(color: UIColor) {
-        layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
+        gradientLayer?.removeFromSuperlayer()
+        gradientLayer = nil
         backgroundColor = color
     }
 
@@ -71,7 +75,7 @@ class MCButton: UIButton {
     }
 
     private func updateGradientFrame() {
-        guard let gradientLayer = layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer else { return }
-        gradientLayer.frame = bounds
+        gradientLayer?.frame = bounds
+        gradientLayer?.cornerRadius = layer.cornerRadius
     }
 }

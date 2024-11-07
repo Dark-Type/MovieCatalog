@@ -11,20 +11,26 @@ class FavoritesTabCoordinator: Coordinator {
     var navigationController = UINavigationController()
     var childCoordinators = [Coordinator]()
     private var viewModel = FavoriteFilmsViewModel()
+    weak var mainCoordinator: MainCoordinator?
 
-    init() {
+    init(mainCoordinator: MainCoordinator) {
+        self.mainCoordinator = mainCoordinator
         navigationController.navigationBar.prefersLargeTitles = true
         navigationController.isNavigationBarHidden = true
         viewModel.delegate = self
     }
 
     func start() {
-        let favoritesView = FavoritesView(viewModel: viewModel)
+        let favoritesView = FavoritesView(viewModel: viewModel, coordinator: self)
         let hostingController = UIHostingController(rootView: favoritesView)
         hostingController.view.backgroundColor = .clear
         hostingController.edgesForExtendedLayout = [.top, .bottom]
         hostingController.modalPresentationStyle = .fullScreen
         navigationController.setViewControllers([hostingController], animated: false)
+    }
+
+    func navigateToFeed() {
+        mainCoordinator?.selectTab(index: 0) // Assuming the Feed tab is at index 0
     }
 
     func showMovieDetail(for movie: MoviesGeneral) {

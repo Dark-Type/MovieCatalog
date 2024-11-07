@@ -34,8 +34,8 @@ class MCGenreLabel: UILabel {
     func addOrangeGradient() {
         deleteOrangeGradient()
         let gradientLayer = ColorsEnum.orangeGradient
-        gradientLayer.frame = bounds
-        layer.insertSublayer(gradientLayer, at: 0)
+        gradientLayer().frame = bounds
+        layer.insertSublayer(gradientLayer(), at: 0)
     }
 
     func deleteOrangeGradient() {

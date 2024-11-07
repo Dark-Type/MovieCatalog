@@ -10,37 +10,37 @@ enum MainCoordinatorConstants {
     static let feedTitle = "Лента"
     static let feedImageName = "Feed"
     static let feedSelectedImageName = "FeedSelected"
-    
+
     static let moviesTitle = "Фильмы"
     static let moviesImageName = "Movie"
     static let moviesSelectedImageName = "MovieSelected"
-    
+
     static let favoritesTitle = "Избранное"
     static let favoritesImageName = "FavoritesBottomBar"
     static let favoritesSelectedImageName = "FavoritesBottomBarSelected"
-    
+
     static let profileTitle = "Профиль"
     static let profileImageName = "Profile"
     static let profileSelectedImageName = "ProfileSelected"
-    
-    static let transitionDuration: TimeInterval = 0.5
-    static let gradientImageSize = CGSize(width: 1, height: 1)
-}
 
+    static let transitionDuration: TimeInterval = 0.5
+    static let gradientImageSize = CGSize(width: 200, height: 20)
+}
 
 class MainCoordinator: NSObject, Coordinator {
     var navigationController: UINavigationController
     var childCoordinators = [Coordinator]()
     var logoutHandler: (() -> Void)?
+    private var tabBarController: MCTabBarController?
 
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
 
     func start() {
-        let tabBarController = MCTabBarController()
-        tabBarController.view.backgroundColor = ColorsEnum.baseDarkGrey
-        animateTransition(to: tabBarController)
+        tabBarController = MCTabBarController()
+        tabBarController?.view.backgroundColor = ColorsEnum.baseDarkGrey
+        animateTransition(to: tabBarController!)
 
         let feedCoordinator = FeedTabCoordinator()
         feedCoordinator.start()
@@ -56,7 +56,7 @@ class MainCoordinator: NSObject, Coordinator {
         moviesVC.hidesBottomBarWhenPushed = false
         setup(vc: moviesVC, title: MainCoordinatorConstants.moviesTitle, imageName: MainCoordinatorConstants.moviesImageName, selectedImageName: MainCoordinatorConstants.moviesSelectedImageName)
 
-        let favoritesCoordinator = FavoritesTabCoordinator()
+        let favoritesCoordinator = FavoritesTabCoordinator(mainCoordinator: self)
         favoritesCoordinator.start()
         childCoordinators.append(favoritesCoordinator)
         let favoritesVC = favoritesCoordinator.navigationController
@@ -74,7 +74,7 @@ class MainCoordinator: NSObject, Coordinator {
         profileVC.hidesBottomBarWhenPushed = false
         setup(vc: profileVC, title: MainCoordinatorConstants.profileTitle, imageName: MainCoordinatorConstants.profileImageName, selectedImageName: MainCoordinatorConstants.profileSelectedImageName)
 
-        tabBarController.viewControllers = [feedVC, moviesVC, favoritesVC, profileVC]
+        tabBarController?.viewControllers = [feedVC, moviesVC, favoritesVC, profileVC]
     }
 
     func setup(vc: UIViewController, title: String, imageName: String, selectedImageName: String) {
@@ -87,18 +87,21 @@ class MainCoordinator: NSObject, Coordinator {
         vc.tabBarItem.setTitleTextAttributes([.foregroundColor: UIColor.gray], for: .normal)
     }
 
+    func selectTab(index: Int) {
+        tabBarController?.selectedIndex = index
+    }
+
     private func logout() {
         logoutHandler?()
     }
 
-  private func animateTransition(to viewController: UIViewController) {
-      
-      self.navigationController.viewControllers = [viewController]
+    private func animateTransition(to viewController: UIViewController) {
+        self.navigationController.viewControllers = [viewController]
     }
 }
 
 func createGradientImage(size: CGSize) -> UIImage? {
-    let gradientLayer = ColorsEnum.orangeGradient
+    let gradientLayer = ColorsEnum.orangeGradient()
     gradientLayer.frame = CGRect(origin: .zero, size: size)
 
     let renderer = UIGraphicsImageRenderer(size: size)

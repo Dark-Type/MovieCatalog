@@ -13,19 +13,18 @@ enum MCTabBarResources {
     static let tabBarBottomOffset: CGFloat = 20
     static let tabBarHorizontalPadding: CGFloat = 25
     static let tabBarWidthOffset: CGFloat = 50
-    static let gradientColors = ColorsEnum.orangeGradient
     static let backgroundColor = ColorsEnum.baseGrey
 }
 
 class MCTabBar: UITabBar {
     override init(frame: CGRect) {
         super.init(frame: frame)
-        customizeTabBar()
+        self.customizeTabBar()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        customizeTabBar()
+        self.customizeTabBar()
     }
 
     private func customizeTabBar() {
@@ -36,16 +35,17 @@ class MCTabBar: UITabBar {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = MCTabBarResources.backgroundColor
 
-        let gradientTextImage = createGradientImage(colors: MCTabBarResources.gradientColors.colors as! [CGColor], size: CGSize(width: 1, height: 1))
-        let gradientColor = UIColor(patternImage: gradientTextImage!)
-
-        appearance.stackedLayoutAppearance.selected.iconColor = gradientColor
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: gradientColor]
+        if let gradientTextImage = createGradientImage(size: CGSize(width: 200, height: 20)) {
+            let gradientColor = UIColor(patternImage: gradientTextImage)
+            appearance.stackedLayoutAppearance.selected.iconColor = gradientColor
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: gradientColor]
+        }
+        appearance.stackedLayoutAppearance.normal.iconColor = UIColor.gray
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.gray]
 
         self.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            self.scrollEdgeAppearance = appearance
-        }
+
+        self.scrollEdgeAppearance = appearance
     }
 
     override func layoutSubviews() {
@@ -60,8 +60,8 @@ class MCTabBar: UITabBar {
         self.frame = tabFrame
     }
 
-    private func createGradientImage(colors: [CGColor], size: CGSize) -> UIImage? {
-        let gradientLayer = ColorsEnum.orangeGradient
+    private func createGradientImage(size: CGSize) -> UIImage? {
+        let gradientLayer = ColorsEnum.orangeGradient()
         gradientLayer.frame = CGRect(origin: .zero, size: size)
 
         let renderer = UIGraphicsImageRenderer(size: size)

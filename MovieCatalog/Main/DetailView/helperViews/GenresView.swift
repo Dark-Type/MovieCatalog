@@ -18,6 +18,7 @@ enum GenresViewConstants {
 }
 
 struct GenresView: View {
+    @ObservedObject var viewModel: MovieDetailViewModel
     let genres: [Genre]
 
     var body: some View {
@@ -34,11 +35,14 @@ struct GenresView: View {
                     Text(genre.name)
                         .padding()
                         .background(
-                            genre.isFavorite ?
+                            viewModel.isFavoriteGenre(genre) ?
                             AnyView(ColorsEnum.orangeLinearGradient) :
                             AnyView(Color(ColorsEnum.baseDarkGrey))
                         )
                         .cornerRadius(GenresViewConstants.itemCornerRadius)
+                        .onTapGesture {
+                            viewModel.toggleFavoriteGenre(genre)
+                        }
                 }
                 .foregroundStyle(.white)
             }
@@ -48,12 +52,4 @@ struct GenresView: View {
         .background(Color(ColorsEnum.baseGrey))
         .cornerRadius(GenresViewConstants.cornerRadius)
     }
-}
-
-#Preview {
-    GenresView(genres: [
-        Genre(id: "1", name: "aboba", isFavorite: false),
-        Genre(id: "2", name: "comedy", isFavorite: true),
-        Genre(id: "3", name: "Fantasy", isFavorite: false)
-    ])
 }

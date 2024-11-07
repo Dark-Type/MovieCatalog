@@ -19,54 +19,53 @@ enum FriendsListViewConstants {
 }
 
 struct FriendsListView: View {
-    var friendsCount: Int
-    var images: [Image]
-
-    init(friendsCount: Int = 3, images: [Image] = []) {
-        self.friendsCount = friendsCount
-        self.images = images.isEmpty ? [
-            Image("Poster1"),
-            Image("Poster2"),
-            Image("Poster3")
-        ] : images
-    }
+    @ObservedObject var viewModel: MovieDetailViewModel
 
     var body: some View {
-        HStack(spacing: FriendsListViewConstants.spacing) {
-            ZStack {
-                ForEach(Array(images.enumerated()), id: \.offset) { index, image in
-                    image
-                        .resizable()
-                        .clipShape(Circle())
-                        .frame(width: FriendsListViewConstants.imageSize, height: FriendsListViewConstants.imageSize)
-                        .foregroundColor(.blue)
-                        .offset(x: CGFloat(index) * FriendsListViewConstants.imageOffset)
-                }
-            }
-            .padding()
-
-            if friendsCount > 1 {
-                Text(String(format: FriendsListViewConstants.friendsCountTextMultiple, friendsCount))
-                    .foregroundStyle(.white)
-                    .padding()
-            } else if friendsCount == 1 {
-                Text(String(format: FriendsListViewConstants.friendsCountTextSingle, friendsCount))
-                    .foregroundStyle(.white)
-                    .padding()
-            } else {
+        VStack {
+            if viewModel.friends.isEmpty {
                 Text(FriendsListViewConstants.noFriendsText)
                     .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
                     .padding()
+                    .padding(.horizontal)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(Color(ColorsEnum.baseGrey))
+                    .cornerRadius(FriendsListViewConstants.cornerRadius)
+                    
+            } else {
+                HStack(spacing: FriendsListViewConstants.spacing) {
+                    ZStack {
+                        ForEach(Array(viewModel.friends.enumerated()), id: \.offset) { index, friend in
+                            if let avatar = friend.avatar {
+                                Image(uiImage: avatar)
+                                    .resizable()
+                                    .clipShape(Circle())
+                                    .frame(width: FriendsListViewConstants.imageSize, height: FriendsListViewConstants.imageSize)
+                                    .offset(x: CGFloat(index) * FriendsListViewConstants.imageOffset)
+                            } else {
+                                Circle()
+                                    .fill(Color.gray)
+                                    .frame(width: FriendsListViewConstants.imageSize, height: FriendsListViewConstants.imageSize)
+                                    .offset(x: CGFloat(index) * FriendsListViewConstants.imageOffset)
+                            }
+                        }
+                    }
+                    .padding()
+
+                    Text(String(format: viewModel.friendsWithHighReviewsCount > 1 ? FriendsListViewConstants.friendsCountTextMultiple : FriendsListViewConstants.friendsCountTextSingle, viewModel.friendsWithHighReviewsCount))
+                        .foregroundStyle(.white)
+                        .padding()
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(Color(ColorsEnum.baseGrey))
+                .cornerRadius(FriendsListViewConstants.cornerRadius)
             }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal)
-        .fixedSize(horizontal: false, vertical: true)
-        .background(Color(ColorsEnum.baseGrey))
-        .cornerRadius(FriendsListViewConstants.cornerRadius)
+        .onAppear {
+            viewModel.loadFriendsWithHighReviews()
+        }
     }
-}
-
-#Preview {
-    FriendsListView()
 }

@@ -11,16 +11,14 @@ class AllMovieCell: UICollectionViewCell {
     private let imageView = UIImageView()
     private let ratingLabel = UILabel()
     private let ratingBackgroundView = UIView()
-    private let favoriteButton = UIButton()
-    private let gradientView = MCGradientView()
+    private let isFavoriteImageView = UIImageView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupImageView()
         setupRatingBackgroundView()
         setupRatingLabel()
-        setupGradientView()
-        setupFavoriteButton()
+        setupIsFavoriteImageView()
     }
 
     required init?(coder: NSCoder) {
@@ -28,18 +26,18 @@ class AllMovieCell: UICollectionViewCell {
     }
 
     private func setupImageView() {
-           imageView.contentMode = .scaleAspectFill
-           imageView.layer.cornerRadius = 10
-           imageView.clipsToBounds = true
-           contentView.addSubview(imageView)
-           imageView.translatesAutoresizingMaskIntoConstraints = false
-           NSLayoutConstraint.activate([
-               imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-               imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
-               imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-               imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-           ])
-       }
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 10
+        imageView.clipsToBounds = true
+        contentView.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
+    }
 
     private func setupRatingBackgroundView() {
         ratingBackgroundView.layer.cornerRadius = 5
@@ -68,29 +66,16 @@ class AllMovieCell: UICollectionViewCell {
         ])
     }
 
-    private func setupGradientView() {
-        gradientView.layer.cornerRadius = 20
-        gradientView.clipsToBounds = true
-        contentView.addSubview(gradientView)
-        gradientView.translatesAutoresizingMaskIntoConstraints = false
+    private func setupIsFavoriteImageView() {
+        isFavoriteImageView.contentMode = .scaleAspectFit
+        isFavoriteImageView.image = UIImage(named: "isFavorite")
+        contentView.addSubview(isFavoriteImageView)
+        isFavoriteImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            gradientView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
-            gradientView.leadingAnchor.constraint(equalTo: ratingLabel.trailingAnchor, constant: 5),
-            gradientView.widthAnchor.constraint(equalToConstant: 20),
-            gradientView.heightAnchor.constraint(equalToConstant: 20)
-        ])
-    }
-
-    private func setupFavoriteButton() {
-        favoriteButton.setImage(UIImage(named: "FilledHeart")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        favoriteButton.tintColor = .white
-        gradientView.addSubview(favoriteButton)
-        favoriteButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            favoriteButton.centerXAnchor.constraint(equalTo: gradientView.centerXAnchor),
-            favoriteButton.centerYAnchor.constraint(equalTo: gradientView.centerYAnchor),
-            favoriteButton.widthAnchor.constraint(equalToConstant: 15),
-            favoriteButton.heightAnchor.constraint(equalToConstant: 15)
+            isFavoriteImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            isFavoriteImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            isFavoriteImageView.widthAnchor.constraint(equalToConstant: 20),
+            isFavoriteImageView.heightAnchor.constraint(equalToConstant: 20)
         ])
     }
 
@@ -98,7 +83,7 @@ class AllMovieCell: UICollectionViewCell {
         imageView.image = movie.poster
         ratingLabel.text = String(format: "%.1f", movie.rating)
         ratingBackgroundView.backgroundColor = colorForRating(movie.rating)
-        favoriteButton.setImage(UIImage(named: "FilledHeart")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        isFavoriteImageView.isHidden = !movie.isFavorite
     }
 
     private func colorForRating(_ rating: Double) -> UIColor {

@@ -36,9 +36,9 @@ class MoviesViewModel {
             case .success(let data):
                 self.featuredMovies = data.featuredMovies
                 self.allMovies = data.allMovies
-                self.currentPageIndex += 2
-                onMoviesViewModelDidUpdateFeaturedMovies?()
-                onMoviesViewModelDidUpdateMovies?()
+                self.currentPageIndex = 3
+                self.onMoviesViewModelDidUpdateFeaturedMovies?()
+                self.onMoviesViewModelDidUpdateMovies?()
             case .failure(let error):
                 print("Failed to fetch initial movies: \(error)")
             }
@@ -50,11 +50,13 @@ class MoviesViewModel {
             guard let self = self else { return }
             switch result {
             case .success(let movies):
-                DataAdapterService.shared.adaptMoviesSummaryData(movies, favoriteMovies: movies) {[weak self] adaptedResult in
+                DataAdapterService.shared.adaptMoviesSummaryData(movies, favoriteMovies: movies) { [weak self] adaptedResult in
                     switch adaptedResult {
                     case .success(let adaptedMovies):
                         self?.favoriteMovies = adaptedMovies
+                        self?.allMovies.append(contentsOf: adaptedMovies)
                         self?.onMoviesViewModelDidUpdateFavoriteMovies?()
+                        self?.onMoviesViewModelDidUpdateMovies?()
                     case .failure(let error):
                         print("Failed to adapt favorite movies: \(error)")
                     }
@@ -106,7 +108,9 @@ class MoviesViewModel {
                     switch adaptedResult {
                     case .success(let adaptedMovies):
                         self?.favoriteMovies = adaptedMovies
+                        self?.allMovies.append(contentsOf: adaptedMovies)
                         self?.onMoviesViewModelDidUpdateFavoriteMovies?()
+                        self?.onMoviesViewModelDidUpdateMovies?()
                     case .failure(let error):
                         print("Failed to adapt favorite movies: \(error)")
                     }

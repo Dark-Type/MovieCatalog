@@ -136,14 +136,11 @@ class FeedVM {
     }
 
     private func saveShownMovies() {
-        let shownMoviesArray = Array(shownMovies)
-        UserDefaults.standard.set(shownMoviesArray, forKey: "shownMovies")
+        ServiceManager.shared.shownMoviesService.addShownMovie(topCardView?.movie?.id ?? "")
     }
 
     private func loadShownMovies() {
-        if let savedMovies = UserDefaults.standard.array(forKey: "shownMovies") as? [String] {
-            shownMovies = Set(savedMovies)
-        }
+        shownMovies = ServiceManager.shared.shownMoviesService.getShownMovies()
     }
 
     func addToFavorites(movie: FeedMovie) {

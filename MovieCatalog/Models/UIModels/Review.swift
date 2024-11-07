@@ -15,6 +15,7 @@ struct Review: Identifiable {
     var createDateTime: String
     var author: Author
     var rating: Int
+    var isUserReview: Bool = false
 }
 extension Review {
     static func create(from details: ReviewDetails, imageService: ImageService, completion: @escaping (Review) -> Void) {

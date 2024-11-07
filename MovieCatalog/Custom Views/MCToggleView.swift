@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 enum MCToggleViewResources {
     static let leftButtonTitle = "Мужчина"
     static let rightButtonTitle = "Женщина"
@@ -23,6 +24,9 @@ class MCToggleView: UIView {
     private let rightButton = UIButton()
     private var isLeftButtonOn = true
 
+    private let leftGradientLayer = CAGradientLayer()
+    private let rightGradientLayer = CAGradientLayer()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupButtons()
@@ -39,6 +43,7 @@ class MCToggleView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        updateGradientFrames()
         updateButtonStates()
     }
 
@@ -64,35 +69,43 @@ class MCToggleView: UIView {
     }
 
     private func updateButtonStates() {
-        if isLeftButtonOn {
-            applyGradient(to: leftButton)
-            rightButton.layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
-            rightButton.backgroundColor = ColorsEnum.baseGrey
-        } else {
-            applyGradient(to: rightButton)
-            leftButton.layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
-            leftButton.backgroundColor = ColorsEnum.baseGrey
+        UIView.animate(withDuration: 0.3) {
+            if self.isLeftButtonOn {
+                self.applyGradient(to: self.leftGradientLayer, on: self.leftButton, maskedCorners: [.layerMinXMinYCorner, .layerMinXMaxYCorner])
+                self.removeGradient(from: self.rightGradientLayer, on: self.rightButton)
+                self.rightButton.backgroundColor = ColorsEnum.baseGrey
+            } else {
+                self.applyGradient(to: self.rightGradientLayer, on: self.rightButton, maskedCorners: [.layerMaxXMinYCorner, .layerMaxXMaxYCorner])
+                self.removeGradient(from: self.leftGradientLayer, on: self.leftButton)
+                self.leftButton.backgroundColor = ColorsEnum.baseGrey
+            }
         }
     }
 
     private func setupButtons() {
         leftButton.setTitle(MCToggleViewResources.leftButtonTitle, for: .normal)
         leftButton.setTitleColor(.white, for: .normal)
+        leftButton.backgroundColor = ColorsEnum.baseGrey
         leftButton.layer.cornerRadius = MCToggleViewResources.buttonCornerRadius
         leftButton.clipsToBounds = true
+        leftButton.translatesAutoresizingMaskIntoConstraints = false
+        leftButton.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
         addSubview(leftButton)
 
         rightButton.setTitle(MCToggleViewResources.rightButtonTitle, for: .normal)
         rightButton.setTitleColor(.white, for: .normal)
+        rightButton.backgroundColor = ColorsEnum.baseGrey
         rightButton.layer.cornerRadius = MCToggleViewResources.buttonCornerRadius
         rightButton.clipsToBounds = true
+        rightButton.translatesAutoresizingMaskIntoConstraints = false
+        rightButton.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         addSubview(rightButton)
+
+        setupGradientLayer(leftGradientLayer, for: leftButton)
+        setupGradientLayer(rightGradientLayer, for: rightButton)
     }
 
     private func setupConstraints() {
-        leftButton.translatesAutoresizingMaskIntoConstraints = false
-        rightButton.translatesAutoresizingMaskIntoConstraints = false
-
         NSLayoutConstraint.activate([
             leftButton.leadingAnchor.constraint(equalTo: leadingAnchor),
             leftButton.topAnchor.constraint(equalTo: topAnchor),
@@ -106,14 +119,39 @@ class MCToggleView: UIView {
         ])
     }
 
-    private func applyGradient(to button: UIButton) {
-        let gradientLayer = ColorsEnum.orangeGradient
+    private func applyGradient(to gradientLayer: CAGradientLayer, on button: UIButton, maskedCorners: CACornerMask) {
+        gradientLayer.removeFromSuperlayer()
+
+        gradientLayer.colors = ColorsEnum.orangeGradient().colors
+        gradientLayer.startPoint = ColorsEnum.orangeGradient().startPoint
+        gradientLayer.endPoint = ColorsEnum.orangeGradient().endPoint
+        gradientLayer.cornerRadius = MCToggleViewResources.buttonCornerRadius
+        gradientLayer.masksToBounds = true
+        gradientLayer.maskedCorners = maskedCorners
+
         gradientLayer.frame = button.bounds
+
         button.layer.insertSublayer(gradientLayer, at: 0)
+        button.bringSubviewToFront(button.titleLabel ?? UIView())
+    }
+
+    private func removeGradient(from gradientLayer: CAGradientLayer, on button: UIButton) {
+        gradientLayer.removeFromSuperlayer()
+    }
+
+    private func setupGradientLayer(_ gradientLayer: CAGradientLayer, for button: UIButton) {
+        gradientLayer.frame = button.bounds
+        gradientLayer.cornerRadius = MCToggleViewResources.buttonCornerRadius
+        gradientLayer.masksToBounds = true
     }
 
     private func setupGestureRecognizers() {
         leftButton.addTarget(self, action: #selector(toggleLeftButton), for: .touchUpInside)
         rightButton.addTarget(self, action: #selector(toggleRightButton), for: .touchUpInside)
+    }
+
+    private func updateGradientFrames() {
+        leftGradientLayer.frame = leftButton.bounds
+        rightGradientLayer.frame = rightButton.bounds
     }
 }

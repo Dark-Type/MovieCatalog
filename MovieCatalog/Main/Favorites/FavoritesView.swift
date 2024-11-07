@@ -10,27 +10,72 @@ import SwiftUI
 
 struct FavoritesView: View {
     @ObservedObject var viewModel: FavoriteFilmsViewModel
+    var coordinator: FavoritesTabCoordinator
 
     var body: some View {
         ScrollView {
-            VStack {
-                HStack {
-                    Text(FavoritesViewConstants.favorites)
-                        .font(.largeTitle)
-                        .padding()
-                        .foregroundStyle(.white)
-                    Spacer()
+            VStack(spacing: 16) {
+                if viewModel.favoriteGenres.isEmpty && viewModel.favoriteFilms.isEmpty {
+                    VStack(spacing: 10) {
+                        GeometryReader { geometry in
+                            Image("PlaceholderImage")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .clipped()
+                        }
+                        .frame(height: UIScreen.main.bounds.height * 0.55)
+                        .ignoresSafeArea(edges: .top)
+
+                        Text("Здесь пока ничего нет")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.top, 10)
+
+                        Text("Добавьте любимые жанры и фильмы, чтобы вернуться к ним позже")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .padding(.top, 5)
+
+                        HStack {
+                            Button(action: {
+                                coordinator.navigateToFeed()
+                            }) {
+                                Text("Найти фильм для себя")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(ColorsEnum.orangeLinearGradient)
+                                    .cornerRadius(10)
+                            }
+                            .frame(maxWidth: UIScreen.main.bounds.width * 0.55, alignment: .leading)
+                            Spacer()
+                        }
+                        .padding(.top, 20)
+                    }
+                } else {
+                    HStack {
+                        Text(FavoritesViewConstants.favorites)
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                            .padding()
+                        Spacer()
+                    }
+                    FavoriteGenresView(viewModel: viewModel)
+                    FavoriteFilmsView(viewModel: viewModel)
                 }
-                FavoriteGenresView(viewModel: viewModel)
-                FavoriteFilmsView(viewModel: viewModel)
             }
+            .frame(maxWidth: .infinity)
             .background(Color(ColorsEnum.baseDarkGrey))
-            .padding()
         }
         .background(Color(ColorsEnum.baseDarkGrey))
+        .onAppear {
+            viewModel.loadFavoriteFilms()
+            viewModel.loadFavoriteGenres()
+        }
     }
 }
-
 enum FavoritesViewConstants {
     static let action = "Action"
     static let comedy = "Comedy"
@@ -50,7 +95,6 @@ enum FavoritesViewConstants {
     static let description = "Some description Some description Some description Some description Some description Some description"
     static let andreiTarkovsky = "Andrei Tarkovsky"
     static let poster1 = "Poster1"
-    static let poster2 = "Poster2"
     static let poster3 = "Poster3"
     static let favorites = "Избранное"
     static let favoriteGenres = "Любимые жанры"

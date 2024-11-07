@@ -51,6 +51,11 @@ class SwipeCardView: UIView {
         addGestureRecognizers()
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer?.frame = overlayView.bounds
+    }
+
     private func setupView() {
         layer.cornerRadius = 10
         clipsToBounds = true
@@ -156,18 +161,15 @@ class SwipeCardView: UIView {
 
     private func applyGradient() {
         gradientLayer?.removeFromSuperlayer()
-
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        let gradient = ColorsEnum.orangeGradient
-        gradient.frame = overlayView.bounds
-        overlayView.layer.insertSublayer(gradient, at: 0)
-        CATransaction.commit()
-        gradientLayer = gradient
+        gradientLayer = ColorsEnum.orangeGradient()
+        gradientLayer?.frame = overlayView.bounds
+        gradientLayer?.cornerRadius = overlayView.layer.cornerRadius
+        overlayView.layer.insertSublayer(gradientLayer!, at: 0)
     }
 
     private func applyGreyOverlay() {
         gradientLayer?.removeFromSuperlayer()
+        gradientLayer = nil
         overlayView.backgroundColor = ColorsEnum.baseGrey
     }
 
@@ -189,6 +191,8 @@ class SwipeCardView: UIView {
             self.brokenHeartImageView.alpha = 0
             self.overlayView.alpha = 0
             self.gradientLayer?.removeFromSuperlayer()
+            self.gradientLayer = nil
+            self.overlayView.backgroundColor = .clear
         }
     }
 }

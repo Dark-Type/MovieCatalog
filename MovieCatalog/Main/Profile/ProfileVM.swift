@@ -84,6 +84,10 @@ class ProfileViewModel {
         changes[key] = value
         delegate?.didUpdateProfile()
     }
+    func updateProfileImageURL(_ url: String, completion: @escaping (Result<Void, Error>) -> Void) {
+           avatarLink = url
+           saveProfile(completion: completion)
+       }
 
     func fetchUserProfile(completion: @escaping () -> Void) {
         ServiceManager.shared.profileService.fetchUserProfile { [weak self] result in
@@ -103,7 +107,7 @@ class ProfileViewModel {
         }
     }
 
-    private func fetchAvatarImage(from url: String) {
+     func fetchAvatarImage(from url: String) {
         ServiceManager.shared.imageService.fetchImage(from: url) { [weak self] result in
             switch result {
             case .success(let image):

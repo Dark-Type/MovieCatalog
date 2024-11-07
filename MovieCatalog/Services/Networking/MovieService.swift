@@ -93,6 +93,7 @@ class MovieService {
 
     func deleteFavoriteMovie(movieId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let url = "\(baseURL)/favorites/\(movieId)/delete"
+        print("Deleting favorite movie with id: \(movieId)")
 
         guard let token = UserDefaults.standard.string(forKey: "authToken") else {
             completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Token not found"])))
@@ -103,18 +104,28 @@ class MovieService {
             "Authorization": "Bearer \(token)"
         ]
 
-        AF.request(url, method: .post, headers: headers).response { response in
+        AF.request(url, method: .delete, headers: headers).response { response in
             switch response.result {
             case .success:
                 completion(.success(()))
+                print("Movie deleted successfully")
+                if let data = response.data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Response: \(responseString)")
+                }
             case .failure(let error):
                 completion(.failure(error))
+                print(error)
+                if let data = response.data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Response: \(responseString)")
+                }
             }
         }
     }
 
     func addFavoriteMovie(movieId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let url = "\(baseURL)/favorites/\(movieId)/add"
+
+        print(movieId)
 
         guard let token = UserDefaults.standard.string(forKey: "authToken") else {
             completion(.failure(NSError(domain: "", code: 401, userInfo: [NSLocalizedDescriptionKey: "Token not found"])))
@@ -147,8 +158,29 @@ class MovieService {
                     completion(.success(movieDetails))
                 case .failure(let error):
                     if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+                        print("Response: \(jsonString)")
                     }
                     print("fetchMovieDetails Failure: \(error.localizedDescription)")
+
+                    if let decodingError = error.asAFError?.underlyingError as? DecodingError {
+                        switch decodingError {
+                        case .dataCorrupted(let context):
+                            print(context)
+                        case .keyNotFound(let key, let context):
+                            print("Key '\(key)' not found:", context.debugDescription)
+                            print("codingPath:", context.codingPath)
+                        case .valueNotFound(let value, let context):
+                            print("Value '\(value)' not found:", context.debugDescription)
+                            print("codingPath:", context.codingPath)
+                        case .typeMismatch(let type, let context):
+                            print("Type '\(type)' mismatch:", context.debugDescription)
+                            print("codingPath:", context.codingPath)
+                        @unknown default:
+                            print("Unknown decoding error")
+                        }
+                    } else {
+                        print("error: ", error)
+                    }
                     completion(.failure(error))
                 }
             }

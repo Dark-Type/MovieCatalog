@@ -21,9 +21,6 @@ struct PosterView: View {
     }
 }
 
-#Preview {
-    PosterView(posterImage: Image("Poster2"))
-}
 
 struct BottomRoundedRectangle: Shape {
     var cornerRadius: CGFloat

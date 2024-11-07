@@ -80,9 +80,9 @@ class FeedVC: UIViewController {
         dateCountryLabel.translatesAutoresizingMaskIntoConstraints = false
 
         genresStackView.axis = .horizontal
-        genresStackView.spacing = 8
+        genresStackView.spacing = 16 
         genresStackView.alignment = .center
-        genresStackView.distribution = .equalCentering
+        genresStackView.distribution = .fillProportionally
         genresStackView.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(nameLabel)
@@ -90,11 +90,11 @@ class FeedVC: UIViewController {
         view.addSubview(genresStackView)
 
         NSLayoutConstraint.activate([
-            nameLabel.bottomAnchor.constraint(equalTo: dateCountryLabel.topAnchor, constant: -20),
+            nameLabel.bottomAnchor.constraint(equalTo: dateCountryLabel.topAnchor, constant: -10),
             nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             nameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
-            dateCountryLabel.bottomAnchor.constraint(equalTo: genresStackView.topAnchor, constant: -20),
+            dateCountryLabel.bottomAnchor.constraint(equalTo: genresStackView.topAnchor, constant: -10),
             dateCountryLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             dateCountryLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
@@ -222,13 +222,20 @@ class FeedVC: UIViewController {
     private func updateGenres(genres: [Genre]) {
         genresStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
+        let availableWidth = genresStackView.frame.width
+        var usedWidth: CGFloat = 0
+
         for genre in genres {
             let genreButton = MCGenreButton(genre: genre)
-            genresStackView.addArrangedSubview(genreButton)
+            genreButton.sizeToFit()
+            let genreWidth = genreButton.frame.width + genresStackView.spacing
 
-            NSLayoutConstraint.activate([
-                genreButton.heightAnchor.constraint(equalToConstant: 30)
-            ])
+            if usedWidth + genreWidth <= availableWidth {
+                genresStackView.addArrangedSubview(genreButton)
+                usedWidth += genreWidth
+            } else {
+                break
+            }
         }
     }
 }

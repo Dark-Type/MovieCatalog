@@ -21,4 +21,20 @@ class ServiceManager {
     let hiddenFilmsService = HiddenFilmsService.shared
     let friendsService = FriendsService.shared
     let genresService = GenreManager.shared
+    let shownMoviesService = ShownMoviesService.shared
+    
+    func setUserLogin(_ userLogin: String) {
+          friendsService.userLogin = userLogin
+        genresService.userLogin = userLogin
+          hiddenFilmsService.userLogin = userLogin
+        shownMoviesService.userLogin = userLogin
+      }
+
+      func resetAllServices() {
+          friendsService.reset()
+          genresService.reset()
+          hiddenFilmsService.reset()
+          shownMoviesService.reset()
+      }
+    
 }

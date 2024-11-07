@@ -21,7 +21,6 @@ extension Author {
         self.avatarURL = details.avatar ?? ""
         self.avatar = nil
     }
-
     static var defaultAuthor: Author {
         return Author(id: "0", name: "Anonymous", avatarURL: "", avatar: UIImage(systemName: "person.crop.circle"))
     }

@@ -22,16 +22,16 @@ class GradientTextLabel: UILabel {
     }
 
     private func setupLayers() {
-        layer.addSublayer(gradientLayer)
+        layer.addSublayer(gradientLayer())
 
         textLayer.alignmentMode = .center
         textLayer.contentsScale = UIScreen.main.scale
-        gradientLayer.mask = textLayer
+        gradientLayer().mask = textLayer
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientLayer.frame = bounds
+        gradientLayer().frame = bounds
         updateTextLayer()
     }
 

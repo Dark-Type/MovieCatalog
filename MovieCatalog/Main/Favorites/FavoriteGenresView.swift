@@ -25,10 +25,7 @@ struct FavoriteGenresView: View {
                         .foregroundStyle(.white)
                     Spacer()
                     Button(action: {
-                        if let index = viewModel.favoriteGenres.firstIndex(where: { $0.id == genre.id }) {
-                            GenreManager.shared.toggleFavoriteStatus(for: genre)
-                            viewModel.favoriteGenres.remove(at: index)
-                        }
+                        viewModel.toggleFavoriteGenre(genre)
                     }) {
                         Image(FavoritesViewConstants.brokenHeart).renderingMode(.template)
                             .foregroundStyle(ColorsEnum.orangeLinearGradient)

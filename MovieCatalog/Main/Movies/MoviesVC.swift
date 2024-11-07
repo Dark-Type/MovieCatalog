@@ -41,12 +41,17 @@ class MoviesVC: UIViewController {
         super.viewDidLoad()
         setupView()
         bindToViewModel()
-        viewModel.loadInitialData()
         addCollectionViewContentSizeObserver()
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.loadInitialData()
     }
 
     deinit {
-        allMoviesCollectionView.removeObserver(self, forKeyPath: "contentSize")
+        if let collectionView = allMoviesCollectionView {
+            collectionView.removeObserver(self, forKeyPath: "contentSize")
+        }
     }
 }
 
@@ -293,13 +298,13 @@ private extension MoviesVC {
 
     @objc func genreButtonTapped(_ sender: MCGenreButton) {
         let genre = sender.genre
-        GenreManager.shared.toggleFavoriteStatus(for: genre)
+        ServiceManager.shared.genresService.toggleFavoriteStatus(for: genre)
         sender.updateAppearance()
     }
 
     func updateGenreButtonBackground(_ button: MCButton, isFavorite: Bool) {
         if isFavorite {
-            button.layer.insertSublayer(ColorsEnum.orangeGradient, at: 0)
+            button.layer.insertSublayer(ColorsEnum.orangeGradient(), at: 0)
         } else {
             button.layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
             button.backgroundColor = .clear
@@ -574,7 +579,7 @@ extension MoviesVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayo
         layout collectionViewLayout: UICollectionViewLayout,
         minimumInteritemSpacingForSectionAt section: Int
     ) -> CGFloat {
-        return 5
+        return 2
     }
 
     func collectionView(

@@ -21,11 +21,11 @@ class MCGradientView: UIView {
     }
 
     private func setupGradientLayer() {
-        layer.insertSublayer(gradientLayer, at: 0)
+        layer.insertSublayer(gradientLayer(), at: 0)
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientLayer.frame = bounds
+        gradientLayer().frame = bounds
     }
 }

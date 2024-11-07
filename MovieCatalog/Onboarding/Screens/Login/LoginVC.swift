@@ -13,7 +13,6 @@ enum LoginVCConstants {
     static let paddingExtraSmall: CGFloat = 8
     static let heightOfItems: CGFloat = 50
     static let welcomeButtonTitle = "Go Back to Welcome"
-    static let completeLoginButtonTitle = "Complete Login"
     static let loginButtonTitle = "Войти"
     static let loginBackgroundImageName = "LoginBackground"
     static let loginTextFieldHint = "Логин"
@@ -37,13 +36,6 @@ class LoginVC: UIViewController {
     }
 
     private let goBackButton = MCGoBackButton(image: UIImage(named: LoginVCConstants.goBackImageName), labelText: LoginVCConstants.goBackLabelText)
-    private let completeLoginButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle(LoginVCConstants.completeLoginButtonTitle, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
 
     private let loginButton: MCButton = {
         let button = MCButton(title: LoginVCConstants.loginButtonTitle)
@@ -79,6 +71,20 @@ class LoginVC: UIViewController {
         return stackView
     }()
 
+    private let errorLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.backgroundColor = ColorsEnum.baseGrey
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.isHidden = true
+        return label
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -96,10 +102,9 @@ class LoginVC: UIViewController {
         view.addSubview(stackView)
         view.addSubview(loginButton)
         view.addSubview(goBackButton)
-        view.addSubview(completeLoginButton)
+        view.addSubview(errorLabel)
 
         goBackButton.button.addTarget(self, action: #selector(dismissVC), for: .touchUpInside)
-        completeLoginButton.addTarget(self, action: #selector(completeLogin), for: .touchUpInside)
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
     }
 
@@ -113,7 +118,6 @@ class LoginVC: UIViewController {
             imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             imageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 591/852)
         ])
-
     }
 
     private func setupBindings() {
@@ -128,7 +132,18 @@ class LoginVC: UIViewController {
     }
 
     private func updateLoginButtonState() {
-        loginButton.isEnabled = viewModel.areAllFieldsValid()
+        if viewModel.areAllFieldsValid() {
+            loginButton.addOrangeGradient()
+            loginButton.setTitleColor(.white, for: .normal)
+            loginButton.isEnabled = true
+            loginButton.isUserInteractionEnabled = true
+        } else {
+            loginButton.deleteOrangeGradient()
+            loginButton.setTitleColor(ColorsEnum.greyFaded, for: .normal)
+            loginButton.setupSolidColorBackground(color: ColorsEnum.baseGrey)
+            loginButton.isEnabled = false
+            loginButton.isUserInteractionEnabled = false
+        }
     }
 
     @objc private func dismissVC() {
@@ -136,13 +151,26 @@ class LoginVC: UIViewController {
     }
 
     @objc private func completeLogin() {
-        viewModel.handleCompleteLogin()
+        viewModel.handleCompleteLogin { [weak self] success in
+            guard let self = self else { return }
+            if !success {
+                self.showError("Wrong password or login")
+            }
+        }
     }
 
     @objc private func loginButtonTapped() {
         viewModel.username = loginTextField.text
         viewModel.password = passwordTextField.text
         completeLogin()
+    }
+
+    private func showError(_ message: String) {
+        errorLabel.text = message
+        errorLabel.isHidden = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.errorLabel.isHidden = true
+        }
     }
 
     private func setupKeyboardObservers() {
@@ -196,11 +224,13 @@ extension LoginVC {
 
             goBackButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: LoginVCConstants.paddingSmall),
             goBackButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: LoginVCConstants.paddingSmall),
-            goBackButton.widthAnchor.constraint(equalToConstant: 250),
+            goBackButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -LoginVCConstants.paddingSmall),
             goBackButton.heightAnchor.constraint(equalToConstant: 60),
 
-            completeLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            completeLoginButton.topAnchor.constraint(equalTo: goBackButton.bottomAnchor, constant: LoginVCConstants.paddingSmall)
+            errorLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: LoginVCConstants.paddingSmall),
+            errorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: LoginVCConstants.paddingSmall),
+            errorLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -LoginVCConstants.paddingSmall),
+            errorLabel.heightAnchor.constraint(equalToConstant: 120)
         ])
     }
 }
@@ -218,7 +248,8 @@ private extension UIView {
         return nil
     }
 }
-extension LoginVC{
+
+extension LoginVC {
     func createRoundedRectShapeLayer(for view: UIView, cornerRadius: CGFloat) -> CAShapeLayer {
         let shapeLayer = CAShapeLayer()
         let path = UIBezierPath(roundedRect: view.bounds, cornerRadius: cornerRadius)

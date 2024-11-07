@@ -25,7 +25,12 @@ enum ReviewsViewConstants {
 struct ReviewsView: View {
     let reviews: [Review]
     @Binding var showAddReview: Bool
+    @ObservedObject var viewModel: MovieDetailViewModel
+    var onEdit: (Review) -> Void
+
     @State private var selectedIndex = 0
+    @State private var showingFriendAddedAlert = false
+    @State private var friendAddedMessage = ""
 
     var body: some View {
         VStack {
@@ -42,24 +47,63 @@ struct ReviewsView: View {
 
             TabView(selection: $selectedIndex) {
                 ForEach(reviews.indices, id: \.self) { index in
-                    ReviewItemView(review: reviews[index])
-                        .padding()
-                        .tag(index)
+                    ReviewItemView(
+                        review: reviews[index],
+                        onEdit: { review in
+                            onEdit(review)
+                        },
+                        onDelete: { review in
+                            viewModel.deleteReview(review: review) { success in
+                                if success {
+                                } else {}
+                            }
+                        },
+                        onAddFriend: { authorDetails in
+                            addFriend(authorDetails)
+                        }
+                    )
+                    .padding()
+                    .tag(index)
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .scaledToFit()
-            .disabled(true)
 
             HStack {
-                Button(action: {
-                    showAddReview = true
-                }) {
-                    Text(ReviewsViewConstants.addReviewButtonText)
-                        .padding()
-                        .background(AnyView(ColorsEnum.orangeLinearGradient))
-                        .cornerRadius(ReviewsViewConstants.buttonCornerRadius)
-                        .foregroundStyle(.white)
+                if let userReview = reviews.first(where: { $0.isUserReview }) {
+                    Button(action: {
+                        onEdit(userReview)
+                    }) {
+                        Text("Изменить отзыв")
+                            .padding()
+                            .background(ColorsEnum.orangeLinearGradient)
+                            .cornerRadius(ReviewsViewConstants.buttonCornerRadius)
+                            .foregroundColor(.white)
+                    }
+
+                    Button(action: {
+                        viewModel.deleteReview(review: userReview) { success in
+                            if success {
+                            } else {}
+                        }
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color(ColorsEnum.baseDarkGrey))
+                            .frame(width: 40, height: 40)
+                            .cornerRadius(ReviewsViewConstants.buttonCornerRadius)
+                    }
+                } else {
+                    Button(action: {
+                        showAddReview = true
+                    }) {
+                        Text(ReviewsViewConstants.addReviewButtonText)
+                            .padding()
+                            .background(ColorsEnum.orangeLinearGradient)
+                            .cornerRadius(ReviewsViewConstants.buttonCornerRadius)
+                            .foregroundColor(.white)
+                    }
                 }
 
                 HStack(spacing: ReviewsViewConstants.spacing) {
@@ -73,6 +117,7 @@ struct ReviewsView: View {
                             .padding()
                             .foregroundStyle(selectedIndex > 0 ? Color(.white) : Color(ColorsEnum.subTitleGrey))
                             .background(selectedIndex > 0 ? Color(ColorsEnum.baseDarkGrey) : Color(ColorsEnum.baseGrey))
+                            .frame(width: 40, height: 40)
                             .cornerRadius(ReviewsViewConstants.buttonCornerRadius)
                     }
                     .disabled(selectedIndex == 0)
@@ -87,6 +132,7 @@ struct ReviewsView: View {
                             .padding()
                             .foregroundStyle(selectedIndex < reviews.count - 1 ? Color(.white) : Color(ColorsEnum.subTitleGrey))
                             .background(selectedIndex < reviews.count - 1 ? Color(ColorsEnum.baseDarkGrey) : Color(ColorsEnum.baseGrey))
+                            .frame(width: 40, height: 40)
                             .cornerRadius(ReviewsViewConstants.buttonCornerRadius)
                     }
                     .disabled(selectedIndex == reviews.count - 1)
@@ -96,11 +142,30 @@ struct ReviewsView: View {
         .padding()
         .background(Color(ColorsEnum.baseGrey))
         .cornerRadius(ReviewsViewConstants.cornerRadius)
+        .alert(isPresented: $showingFriendAddedAlert) {
+            Alert(title: Text("Friend Added"), message: Text(friendAddedMessage), dismissButton: .default(Text("OK")))
+        }
+    }
+
+    private func addFriend(_ authorDetails: AuthorDetails) {
+        guard let userLogin = viewModel.currentUserProfile?.nickName else {
+            print("Error: userLogin is nil")
+            return
+        }
+        viewModel.friendsWithHighReviewsCount += 1
+        FriendsService.shared.addFriend(authorDetails)
+        friendAddedMessage = "\(authorDetails.nickName ?? "This author") был добавлен Вам в друзья."
+        showingFriendAddedAlert = true
+        print("Friend added: \(authorDetails.nickName ?? "Unknown") for userLogin: \(userLogin)")
+        viewModel.loadFriendsWithHighReviews()
     }
 }
 
 struct ReviewItemView: View {
     let review: Review
+    let onEdit: (Review) -> Void
+    let onDelete: (Review) -> Void
+    let onAddFriend: (AuthorDetails) -> Void
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -108,26 +173,34 @@ struct ReviewItemView: View {
                 if let avatar = review.author.avatar {
                     Image(uiImage: avatar)
                         .resizable()
-                        .scaledToFit()
-                        .frame(width: ReviewsViewConstants.avatarSize, height: ReviewsViewConstants.avatarSize)
+                        .frame(width: 50, height: 50)
                         .clipShape(Circle())
+                        .onTapGesture {
+                            if let authorDetails = review.author.toAuthorDetails() {
+                                onAddFriend(authorDetails)
+                            }
+                        }
                 } else {
-                    Image(systemName: ReviewsViewConstants.personCircleImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: ReviewsViewConstants.avatarSize, height: ReviewsViewConstants.avatarSize)
-                        .clipShape(Circle())
+                    Circle()
+                        .fill(Color.gray)
+                        .frame(width: 50, height: 50)
+                        .onTapGesture {
+                            if let authorDetails = review.author.toAuthorDetails() {
+                                onAddFriend(authorDetails)
+                            }
+                        }
                 }
 
                 VStack(alignment: .leading) {
                     Text(review.author.name)
-                        .foregroundStyle(.white)
                         .font(.headline)
                     Text(review.createDateTime)
-                        .foregroundStyle(.white)
                         .font(.subheadline)
+                        .foregroundColor(.gray)
                 }
+
                 Spacer()
+
                 HStack {
                     Image(ReviewsViewConstants.favoriteStarImage)
                         .renderingMode(.template)
@@ -150,5 +223,12 @@ struct ReviewItemView: View {
         .padding()
         .background(Color(ColorsEnum.baseDarkGrey))
         .cornerRadius(ReviewsViewConstants.buttonCornerRadius)
+    }
+}
+
+extension Author {
+    func toAuthorDetails() -> AuthorDetails? {
+        guard id != "Anonymous" else { return nil }
+        return AuthorDetails(userId: id, nickName: name, avatar: avatarURL)
     }
 }

@@ -80,9 +80,3 @@ struct DirectorItemView: View {
     }
 }
 
-#Preview {
-    DirectorView(authors: [
-        Author(id: "1", name: "Nill Kiggers", avatarURL: "dsf", avatar: UIImage(named: "Poster1")!),
-        Author(id: "2", name: "Nate Higgers", avatarURL: "sdfsd", avatar: UIImage(named: "Poster2")!)
-    ])
-}
