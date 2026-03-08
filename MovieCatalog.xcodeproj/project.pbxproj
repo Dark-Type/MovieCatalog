@@ -53,16 +53,6 @@
 			path = MovieCatalog;
 			sourceTree = "<group>";
 		};
-		A54127AE2CB8417100A45751 /* MovieCatalogTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MovieCatalogTests;
-			sourceTree = "<group>";
-		};
-		A54127B82CB8417100A45751 /* MovieCatalogUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MovieCatalogUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,8 +86,6 @@
 			isa = PBXGroup;
 			children = (
 				A54127972CB8417000A45751 /* MovieCatalog */,
-				A54127AE2CB8417100A45751 /* MovieCatalogTests */,
-				A54127B82CB8417100A45751 /* MovieCatalogUITests */,
 				A54127962CB8417000A45751 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,9 +140,6 @@
 			dependencies = (
 				A54127AD2CB8417100A45751 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				A54127AE2CB8417100A45751 /* MovieCatalogTests */,
-			);
 			name = MovieCatalogTests;
 			packageProductDependencies = (
 			);
@@ -174,9 +159,6 @@
 			);
 			dependencies = (
 				A54127B72CB8417100A45751 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A54127B82CB8417100A45751 /* MovieCatalogUITests */,
 			);
 			name = MovieCatalogUITests;
 			packageProductDependencies = (
